@@ -1,8 +1,44 @@
-import { Migration } from '../cli/migration';
+import { Migration } from "../cli/migration";
 import { PrismaClient } from "@prisma/client";
 
 export default class implements Migration {
   async up(prisma: PrismaClient) {
+    try {
+      await prisma.$queryRaw`CREATE TABLE "films" (
+                                                     "film_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                                                     "name" TEXT NOT NULL,
+                                                     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                           )`;
+      await prisma.$queryRaw`CREATE TABLE "slot" (
+                            "slotid" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                            "film_id" INTEGER,
+                            "time" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )`;
+      await prisma.$queryRaw`CREATE TABLE "shows" (
+        "show_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        "slotid" INTEGER,
+        "timeslot" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "screen_id" INTEGER
+      )`;
+      await prisma.$queryRaw`CREATE TABLE "theater" (
+        "theatre_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        "name" TEXT NOT NULL,
+        "total_screens": INTEGER
+      )`;
+      await prisma.$queryRaw`CREATE TABLE "theater_screens" (
+        "screen_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        "name" TEXT NOT NULL,
+        "total_seating: INTEGER
+      )`;
+      await prisma.$queryRaw`CREATE TABLE "screen_seating" (
+        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        "screen_id" INTEGER,
+        "seat_count": INTEGER,
+        "seat_category_type": TEXT
+      )`;
+    } catch (e) {
+      console.error(e);
+    }
     /**
      # ToDo: Create a migration that creates all tables for the following user stories
 
@@ -33,7 +69,7 @@ export default class implements Migration {
      * As a cinema owner I dont want to configure the seating for every show
      */
 
-    throw new Error('TODO: implement migration in task 4');
+    throw new Error("TODO: implement migration in task 4");
   }
 
   async down(prisma: PrismaClient) {
